@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeuroCompanion</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    form label {
+      display: block;
+      margin: 1rem 0 0.3rem;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      box-sizing: border-box;
+    }
+    ul#sessionLog {
+      list-style: none;
+      padding-left: 0;
+    }
+    ul#sessionLog li {
+      background: #e0f7fa;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>NeuroCompanion</h1>
+    <p>Track your muscle activity and rehab progress</p>
+    
+    <form id="logForm">
+      <label for="muscleGroup">Muscle Group:</label>
+      <input type="text" id="muscleGroup" name="muscleGroup" required>
+
+      <label for="activity">Activity Type:</label>
+      <select id="activity" name="activity">
+        <option value="flexion">Flexion</option>
+        <option value="extension">Extension</option>
+        <option value="rotation">Rotation</option>
+      </select>
+
+      <label for="intensity">Intensity (1–10):</label>
+      <input type="number" id="intensity" name="intensity" min="1" max="10" required>
+
+      <label for="notes">Notes:</label>
+      <textarea id="notes" name="notes"></textarea>
+
+      <button type="submit">Log Activity</button>
+    </form>
+
+    <h2>Session Log</h2>
+    <ul id="sessionLog"></ul>
+  </div>
+
+  <script>
+    const form = document.getElementById('logForm');
+    const sessionLog = document.getElementById('sessionLog');
+
+    function loadLogs() {
+      const logs = JSON.parse(localStorage.getItem('logs') || '[]');
+      sessionLog.innerHTML = '';
+      logs.forEach(log => {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${log.muscleGroup}</strong> (${log.activity}, intensity ${log.intensity})<br>${log.notes}`;
+        sessionLog.appendChild(li);
+      });
+    }
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const log = {
+        muscleGroup: form.muscleGroup.value,
+        activity: form.activity.value,
+        intensity: form.intensity.value,
+        notes: form.notes.value
+      };
+
+      const logs = JSON.parse(localStorage.getItem('logs') || '[]');
+      logs.unshift(log); // Add newest on top
+      localStorage.setItem('logs', JSON.stringify(logs));
+      loadLogs();
+      form.reset();
+    });
+
+    loadLogs();
+  </script>
+</body>
+</html>
